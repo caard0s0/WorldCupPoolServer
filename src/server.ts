@@ -5,6 +5,11 @@ async function bootstrap() {
         logger: true,
     })
 
+    // Route balloon count
+    fastify.get('/pools/count', () => {
+        return { count : 0 }
+    })
+
     await fastify.listen({ port: 3333 });
 }
 
