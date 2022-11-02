@@ -24,6 +24,20 @@ async function bootstrap() {
         return { count }
     })
 
+    // Route for users count
+    fastify.get('/users/count', async () => {
+        const count = await prisma.user.count()
+
+        return { count }
+    })
+
+    // Route guesses count
+    fastify.get('/guesses/count', async () => {
+        const count = await prisma.guess.count()
+
+        return { count }
+    })
+
     // Route to create a pool
     fastify.post('/pools', async (request, reply) => {
         const createPoolBody = z.object({
