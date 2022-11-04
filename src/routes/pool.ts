@@ -55,7 +55,7 @@ export async function poolRoutes(fastify: FastifyInstance) {
     })
 
     // Route to join a pool
-    fastify.post('/pools/:id/join', {
+    fastify.post('/pools/join', {
         onRequest: [authenticate]
     }, async (request, reply) => {
         const joinPoolBody = z.object({
@@ -122,6 +122,50 @@ export async function poolRoutes(fastify: FastifyInstance) {
                         userId: request.user.sub
                     }
                 }
+            },
+            include: {
+                _count: {
+                    select: {
+                        participants: true
+                    }
+                },
+                participants: {
+                    select: {
+                        id: true,
+
+                        user: {
+                            select: {
+                                avatarUrl: true
+                            }
+                        }
+                    },
+                    take: 4
+                },
+                owner: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        })
+
+        return { pools }
+    })
+
+    // Route to details of a specific pool
+    fastify.get('/pools/:id', {
+        onRequest: [authenticate]
+    }, async (request) => {
+        const getPoolParams = z.object({
+            id: z.string()
+        })
+
+        const { id } = getPoolParams.parse(request.params)
+
+        const pools = await prisma.pool.findUnique({
+            where: {
+                id
             },
             include: {
                 _count: {
